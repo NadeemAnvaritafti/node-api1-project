@@ -75,9 +75,7 @@ server.delete('/api/users/:id', (req, res) => {
 server.put('/api/users/:id', (req, res) => {
     const id = req.params.id;
     const usersData = req.body;
-    if (!usersData.name || !usersData.bio) {
-        res.status(400).json({ errorMessage: 'Please provide name and bio for the user.' })
-    }
+    
     db.findById(id) 
         .then(user => {
             if (!user) {
@@ -85,13 +83,16 @@ server.put('/api/users/:id', (req, res) => {
             }
         })
         .catch(error => {
-            console.log('error on GET /api/users/:id', error);
+            console.log('error on finding specific ID /api/users/:id', error);
             res.status(500).json({ error: 'The user information could not be retrieved.' })
         }) 
-    if (usersData.name && usersData.bio && id) {
+
+    if (!usersData.name || !usersData.bio) {
+        res.status(400).json({ errorMessage: 'Please provide name and bio for the user.' })
+    }  else {
         db.update(id, usersData)
         .then(user => {
-            res.status(200).json(user);
+            res.status(200).json({ message: `user ${id} was updated` });
         })
         .catch(error => {
             console.log('error on PUT /api/users/:id', error);
@@ -99,9 +100,6 @@ server.put('/api/users/:id', (req, res) => {
         })
     }
 })
-
-
-
 
 
 const port = 4001;
